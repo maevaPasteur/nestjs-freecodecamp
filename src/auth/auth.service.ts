@@ -5,9 +5,9 @@ import { Repository } from "typeorm";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import * as bcrypt from 'bcrypt';
-import { omit } from 'lodash';
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config';
+import { UserEventsService } from "../events/user-events.service";
 
 @Injectable()
 export class AuthService {
@@ -16,6 +16,7 @@ export class AuthService {
         private userRepository: Repository<User>,
         private jwtService: JwtService,
         private configService: ConfigService,
+        private readonly userEventsService: UserEventsService,
     ){}
 
     private generateAccessToken(user: User): string {
@@ -75,7 +76,8 @@ export class AuthService {
             role: role,
         });
         const savedUser = await this.userRepository.save(newUser);
-        return omit(savedUser, ['password']);
+        this.userEventsService.emitUserRegistered(newUser);
+        return savedUser;
     }
 
     async register(registerDto: RegisterDto): Promise<{user: User, message: string}> {
@@ -104,7 +106,7 @@ export class AuthService {
             throw new UnauthorizedException("Invalid credentials")
         }
         return {
-            user: omit(user, ['password']),
+            user,
             ...this.generateTokens(user),
         }
     }

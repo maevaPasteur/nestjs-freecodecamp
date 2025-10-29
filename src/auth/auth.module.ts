@@ -7,12 +7,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import {JwtStrategy} from "./strategies/jwt.strategy";
 import {RolesGuards} from "./guards/roles.guards";
+import { EventsModule } from "../events/events.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.register({}),
+    EventsModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, RolesGuards]

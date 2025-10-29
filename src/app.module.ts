@@ -8,9 +8,12 @@ import appConfig from './config/app.config';
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Post } from './posts/entities/post.entity'
 import { User } from './auth/entities/user.entity'
+import { File } from './file-upload/entities/file.entity'
 import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule } from "@nestjs/throttler";
 import { CacheModule } from "@nestjs/cache-manager";
+import { FileUploadModule } from './file-upload/file-upload.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -38,11 +41,13 @@ import { CacheModule } from "@nestjs/cache-manager";
       username: process.env.DATABASE_USERNAME || 'postgres',
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [Post, User],
-      synchronize: process.env.mode === 'dev', // dev mode only
+      entities: [Post, User, File],
+      synchronize: process.env.MODE === 'dev', // dev mode only
     }),
     PostsModule,
-    AuthModule
+    AuthModule,
+    FileUploadModule,
+    EventsModule
   ],
   controllers: [AppController],
   providers: [AppService],
