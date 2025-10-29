@@ -10,9 +10,7 @@ export class LoggingInterceptor implements NestInterceptor {
     const { method, url, body, query, param } = request;
     const userAgent = request.get('user-agent') || 'unknown';
     const userId = request?.user?.id || 'unauthenticated';
-    this.logger.log(`
-    [${method} ${url} - User: ${userId} - User Agent: ${userAgent}}]
-    `);
+    this.logger.log(`[${method}] ${url} - User: ${userId} - User Agent: ${userAgent}}`);
     const startTime = Date.now();
 
     //tag operator allow to perform side effects
@@ -21,16 +19,12 @@ export class LoggingInterceptor implements NestInterceptor {
         next: (data) => {
           const endTime = Date.now();
           const duration = endTime - startTime;
-          this.logger.log(`
-          [${method} ${url}: ${duration}ms - Response size ${JSON.stringify(data)?.length || 0} bytes]
-          `)
+          this.logger.log(`[${method}] ${url}: ${duration}ms - Response size ${JSON.stringify(data)?.length || 0} bytes`)
         },
         error: (error) => {
           const endTime = Date.now();
           const duration = endTime - startTime;
-          this.logger.log(`
-          [${method} ${url} - ${duration}ms - Error ${error.message}]
-          `)
+          this.logger.error(`[${method}] ${url} - ${duration}ms - Error ${error.message}`)
         }
       })
     )
